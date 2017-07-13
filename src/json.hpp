@@ -493,7 +493,11 @@ static int MemberIndexToMapIndex( int index )
     }
     return 0;
 #elif defined( __GNUC__ ) || defined( __clang__ )
-    return 32 - __builtin_clz( (unsigned int) index );
+    // fixme: undefined https://stackoverflow.com/questions/19527897/how-undefined-are-builtin-ctz0-or-builtin-clz0
+    if ( index == 0 )
+        return 0;
+    else
+        return 32 - __builtin_clz( index );
 #else
     int r = 0;
     int t;
