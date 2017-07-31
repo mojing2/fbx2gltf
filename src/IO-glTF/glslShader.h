@@ -31,13 +31,19 @@ namespace _IOglTF_NS_ {
 class glslShader {
 
 protected:
+
 	utility::string_t _name ;
 	utility::string_t _declarations ;
 	utility::string_t _body ;
 	std::map<utility::string_t, utility::string_t> _allSymbols ;
 
 public:
-	glslShader (const utility::char_t *glslVersion =nullptr) ;
+	enum class ShaderType
+	{
+		Vertex,
+		Fragment
+	};
+	glslShader (ShaderType shaderType, const utility::char_t *glslVersion =nullptr) ;
 	virtual ~glslShader () ;
 
 	utility::string_t &name () ;
@@ -45,8 +51,11 @@ protected:
 	void _addDeclaration (utility::string_t qualifier, utility::string_t symbol, unsigned int type, size_t count, bool forcesAsAnArray =false) ;
 	utility::string_t body () ;
 public:
+	void addProjectionUniformBuffer(int& uniformLayoutLocation);
+	void addJointUniformBuffer(int& uniformLayoutLocation);
+	void addJointUniformBuffer();
 	void addAttribute (utility::string_t symbol, unsigned int type, size_t count =1, bool forcesAsAnArray =false) ;
-	void addUniform (utility::string_t symbol, unsigned int type, size_t count =1, bool forcesAsAnArray =false) ;
+	void addUniform (utility::string_t symbol, unsigned int type, int& uniformLayoutLocation, size_t count =1, bool forcesAsAnArray =false) ;
 	void addVarying (utility::string_t symbol, unsigned int type, size_t count =1, bool forcesAsAnArray =false) ;
 	bool hasSymbol (const utility::string_t &symbol) ;
 
@@ -77,6 +86,8 @@ class glslTech {
 	bool _bHasAmbientLight ;
 	bool _bHasSpecularLight ;
 	bool _bHasNormalMap ;
+	
+	int _uniformLayoutLocation = 0;
 
 protected:
 	glslShader _vertexShader ;

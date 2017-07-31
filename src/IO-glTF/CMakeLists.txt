@@ -52,3 +52,8 @@ find_path( CPPREST_INCLUDE cpprest/http_client.h )
 find_library( CPPREST_LIB NAMES cpprest_2_9d cpprest_2_9 cpprestd cpprest )
 target_include_directories( IO-glTF PUBLIC ${CPPREST_INCLUDE} )
 target_link_libraries( IO-glTF PUBLIC ${CPPREST_LIB} )
+
+#
+# shaderc
+#
+target_include_directories( IO-glTF PRIVATE $ENV{VK_SDK_PATH}/Include )

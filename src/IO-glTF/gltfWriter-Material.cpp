@@ -277,7 +277,6 @@ web::json::value gltfWriter::WriteMaterialParameter (const utility::char_t *pszN
 	if ( property.IsValid () && property.GetSrcObjectCount<FbxTexture> () != 0 ) {
 		FbxTexture *pTexture =property.GetSrcObject<FbxTexture> (0) ;
 		values [pszName] =web::json::value::string (createTextureName (pTexture->GetName ())) ;
-		ucout << pMaterial->GetName() ;
 		if (strncmp(pMaterial->GetName(), "spheremtl", 9) == 0)
 		{
 			techniqueParameters[pszName] = web::json::value::object({ { U("type"), IOglTF::SAMPLER_OES } });

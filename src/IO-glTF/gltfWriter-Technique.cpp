@@ -30,24 +30,25 @@ void gltfWriter::AdditionalTechniqueParameters (FbxNode *pNode, web::json::value
 			{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT3) }
 		}) ;
 	}
-	techniqueParameters [U("modelViewMatrix")] =web::json::value::object ({ // modeliew matrix
-		{ U("semantic"), web::json::value::string (U("MODELVIEW")) },
-		{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
-	}) ;
-	techniqueParameters [U("projectionMatrix")] =web::json::value::object ({ // projection matrix
-		{ U("semantic"), web::json::value::string (U("PROJECTION")) },
-		{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
-	}) ;
+	// todo:
+	//techniqueParameters [U("modelViewMatrix")] =web::json::value::object ({ // modeliew matrix
+	//	{ U("semantic"), web::json::value::string (U("MODELVIEW")) },
+	//	{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
+	//}) ;
+	//techniqueParameters [U("projectionMatrix")] =web::json::value::object ({ // projection matrix
+	//	{ U("semantic"), web::json::value::string (U("PROJECTION")) },
+	//	{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
+	//}) ;
 
 //d:\projects\gltf\converter\collada2gltf\shaders\commonprofileshaders.cpp #905
-	if ( hasSkinning ) {
-		techniqueParameters [U("jointMat")] =web::json::value::object ({ // joint matrix
-				{ U("count"), web::json::value::number((int) _skinJointNames.size()) },
-				{ U("semantic"), web::json::value::string (U("JOINTMATRIX")) },
-				{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
-				}) ;
+	//if ( hasSkinning ) {
+	//	techniqueParameters [U("jointMat")] =web::json::value::object ({ // joint matrix
+	//			{ U("count"), web::json::value::number((int) _skinJointNames.size()) },
+	//			{ U("semantic"), web::json::value::string (U("JOINTMATRIX")) },
+	//			{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
+	//			}) ;
 
-	}
+	//}
 
 	// We ignore lighting if the only light we have is ambient
 	int lightCount =pNode->GetScene ()->RootProperty.GetSrcObjectCount<FbxLight> () ;

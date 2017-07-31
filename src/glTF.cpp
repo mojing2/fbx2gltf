@@ -145,7 +145,7 @@ int main (int argc, char *argv []) {
 		outDir =utility::conversions::to_string_t (FbxPathUtils::GetFolderName (utility::conversions::to_utf8string (inFile).c_str ()).Buffer ()) ;
 #if defined(_WIN32) || defined(_WIN64)
 	if ( outDir [outDir.length () - 1] != U('\\') )
-		outDir +=U('\\') ;
+		outDir += U('\\') ;
 #else
 	if ( outDir [outDir.length () - 1] != U('/') )
 		outDir +=U('/') ;

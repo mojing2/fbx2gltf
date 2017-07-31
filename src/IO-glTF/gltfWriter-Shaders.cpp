@@ -21,6 +21,7 @@
 #include "StdAfx.h"
 #include "gltfWriter.h"
 #include "glslShader.h"
+#include "shaderc/shaderc.hpp"
 
 namespace _IOglTF_NS_ {
 
@@ -58,7 +59,8 @@ bool gltfWriter::WriteShaders () {
 		glslTech tech (
 			_json [U("techniques")] [techniqueName],
 			iter->second [U("values")],
-			_json
+			_json,
+			U("310 es")
 		) ;
 
 		utility::string_t programName =_json [U("techniques")] [techniqueName] [U("program")].as_string () ;
