@@ -385,14 +385,14 @@ void glslTech::prepareParameters (web::json::value technique) {
 			if ( bIsAttribute )
 				_vertexShader.addAttribute (iter->first, iType) ;
 			else
-				 //if(iter->first == U("jointMat") ) 
-				 //{
+				 if(iter->first == U("jointMat") || iter->first == U("modelViewMatrix") || iter->first == U("projectionMatrix") ) 
+				 {
 					//unsigned int matSize =iter->second.as_object () [U("count")].as_integer () ;
 					//utility::string_t jointMat =glslTech::format (U("%s[%d]"), iter->first.c_str(), matSize) ;
 					//_vertexShader.addUniform (jointMat, iType, _uniformLayoutLocation) ;
 					//_uniformLayoutLocation += 17;
-				 //}
-				 //else
+				 }
+				 else
 				 {
 					 _vertexShader.addUniform(iter->first, iType, _uniformLayoutLocation);
 				 }
