@@ -193,7 +193,7 @@ void glslShader::addUniform (utility::string_t symbol, unsigned int type, int& u
 	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
 }
 
-void glslShader::addVarying (utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
+void glslShader::addVaryingOut (utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
 	symbol =U("v_") +  symbol ;
 	
 	utility::string_t qualifier = U("layout( location = ");
@@ -201,6 +201,16 @@ void glslShader::addVarying (utility::string_t symbol, unsigned int type, size_t
 	qualifier += U(" ) out");
 
 	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
+}
+
+void glslShader::addVaryingIn(utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
+	symbol = U("v_") + symbol;
+
+	utility::string_t qualifier = U("layout( location = ");
+	qualifier += utility::conversions::to_string_t(GetVertexVaryingLocation(symbol));
+	qualifier += U(" ) in");
+
+	_addDeclaration(qualifier, symbol, type, count, forcesAsAnArray);
 }
 
 bool glslShader::hasSymbol (const utility::string_t &symbol) {
@@ -373,7 +383,7 @@ void glslTech::prepareParameters (web::json::value technique) {
 	//
 	// fragColor
 	//
-	_fragmentShader.addVarying(U("fragColor"), glTF::IOglTF::FLOAT_VEC4);
+	_fragmentShader.addVaryingOut(U("fragColor"), glTF::IOglTF::FLOAT_VEC4);
 
 	// Parameters / attribute - uniforms - varying
 	web::json::value parameters =technique [U("parameters")] ;
@@ -398,8 +408,8 @@ void glslTech::prepareParameters (web::json::value technique) {
 				 }
 			utility::string_t v =needsVarying (iter->first.c_str ()) ;
 			if ( v != U("") ) {
-				_vertexShader.addVarying (iter->first, iType) ;
-				_fragmentShader.addVarying (iter->first, iType) ;
+				_vertexShader.addVaryingOut (iter->first, iType) ;
+				_fragmentShader.addVaryingIn (iter->first, iType) ;
 			}
 		}
 		if ( glslTech::isFragmentShaderSemantic (iter->first.c_str ()) ) {
@@ -623,8 +633,8 @@ void glslTech::lighting2 (web::json::value technique, web::json::value gltf) {
 					_fragmentShader.appendCode (U("}\n")) ;
 				} else {
 					utility::string_t szVaryingLightDirection =glslTech::format (U("%sDirection"), szLightIndex.c_str ()) ;
-					_vertexShader.addVarying (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
-					_fragmentShader.addVarying (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
+					_vertexShader.addVaryingOut (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
+					_fragmentShader.addVaryingIn (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
 					if (   /*_vertexShader.hasSymbol (U("v_position")) == false
 						&&*/ (lightingModel == U("Phong") || lightingModel == U("Blinn") || lightType == U("spot"))
 					) {

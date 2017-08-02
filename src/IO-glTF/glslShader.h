@@ -56,7 +56,8 @@ public:
 	void addJointUniformBuffer();
 	void addAttribute (utility::string_t symbol, unsigned int type, size_t count =1, bool forcesAsAnArray =false) ;
 	void addUniform (utility::string_t symbol, unsigned int type, int& uniformLayoutLocation, size_t count =1, bool forcesAsAnArray =false) ;
-	void addVarying (utility::string_t symbol, unsigned int type, size_t count =1, bool forcesAsAnArray =false) ;
+	void addVaryingOut (utility::string_t symbol, unsigned int type, size_t count =1, bool forcesAsAnArray =false) ;
+	void addVaryingIn(utility::string_t symbol, unsigned int type, size_t count = 1, bool forcesAsAnArray = false);
 	bool hasSymbol (const utility::string_t &symbol) ;
 
 	void appendCode (const char *format, ...) ;
