@@ -10,6 +10,7 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 message (STATUS "Ouput Directory: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
+#add_subdirectory( $ENV{VK_SDK_PATH}/shaderc shaderc )
 add_subdirectory( ./IO-glTF IO-glTF )
 
 #
@@ -51,6 +52,7 @@ target_compile_options( fbx2gltf PRIVATE -Wall )
 
 target_link_libraries( fbx2gltf 
 	IO-glTF
+	#shaderc
 	debug $ENV{FBX_SDK}/lib/vs2015/x64/debug/libfbxsdk.lib
 	optimized $ENV{FBX_SDK}/lib/vs2015/x64/release/libfbxsdk.lib
 )

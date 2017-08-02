@@ -30,6 +30,7 @@ void gltfWriter::AdditionalTechniqueParameters (FbxNode *pNode, web::json::value
 			{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT3) }
 		}) ;
 	}
+	// todo:
 	techniqueParameters [U("modelViewMatrix")] =web::json::value::object ({ // modeliew matrix
 		{ U("semantic"), web::json::value::string (U("MODELVIEW")) },
 		{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }

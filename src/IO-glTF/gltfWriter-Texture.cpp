@@ -24,9 +24,9 @@
 #include <process.h>
 #include <direct.h>
 
-static bool Execute(const char * path)
+static bool Execute(const wchar_t * path)
 {
-	return (_spawnl(_P_WAIT, path, path, NULL) != -1);
+	return (_wspawnl(_P_WAIT, path, path, NULL) != -1);
 }
 
 namespace _IOglTF_NS_ {
@@ -72,8 +72,9 @@ web::json::value gltfWriter::WriteTexture (FbxTexture *pTexture) {
 		cmd += inImagePath;
 		cmd += U(" -o ");
 		cmd += outImagePath;
-		cmd += U(" -f ETC2_RGB -q etcfast -m ");
+		cmd += U(" -f ETC2_RGB -q etcfast ");
 		//cmd += U(" -f BC3 -m ");
+		//cmd += U(" -f ASTC_6x6 -q astcfast ");
 
 		wchar_t scriptPath[1024];
 		int bytes = GetModuleFileName(NULL, scriptPath, 1024);
@@ -88,7 +89,9 @@ web::json::value gltfWriter::WriteTexture (FbxTexture *pTexture) {
 		fprintf_s(f, utility::conversions::to_utf8string(cmd).c_str());
 		fflush(f);
 		fclose(f);
-		Execute("CompressTexture.bat");
+
+		int result = _wspawnl(_P_WAIT, scriptPath, scriptPath, NULL);
+		assert( result != -1 );
 
 		image [name] [U("uri")] =web::json::value::string (IOglTF::dataURI (outImagePath)) ;
 	} /*else*/

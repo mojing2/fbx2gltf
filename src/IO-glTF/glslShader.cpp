@@ -33,11 +33,42 @@ namespace _IOglTF_NS_ {
 //	U("normalMatrix"), U("modelViewMatrix"), U("projectionMatrix")
 //} ;
 
-glslShader::glslShader (const utility::char_t *glslVersion /*=nullptr*/) {
+	// TODO:
+	// multiview support
+	// vulkan SPIR-V support
+glslShader::glslShader (glslShader::ShaderType shaderType, const utility::char_t *glslVersion /*=nullptr*/) {
 	_declarations =U("") ;
 	if ( glslVersion )
 		_declarations +=U("#version ") + utility::string_t (glslVersion) + U("\n") ;
-	_declarations +=U("precision highp float ;\n") ;
+	
+	//
+	// enable extension
+	//
+	switch (shaderType)
+	{
+	case glTF::glslShader::ShaderType::Vertex:
+		_declarations += U("#extension GL_EXT_shader_io_blocks : enable\n");
+		break;
+	case glTF::glslShader::ShaderType::Fragment:
+		break;
+	default:
+		break;
+	}
+	_declarations += U("#extension GL_ARB_enhanced_layouts : enable\n");
+
+	//
+	// precision
+	//
+	_declarations += U("precision highp float;\n");
+	_declarations += U("precision highp int;\n");
+
+	//
+	// gl_PerVertex
+	//
+	if ( shaderType == glTF::glslShader::ShaderType::Vertex )
+	{
+		_declarations += U("out gl_PerVertex { vec4 gl_Position; };\n");
+	}
 	_body =U("") ;
 }
 
@@ -61,19 +92,125 @@ void glslShader::_addDeclaration (utility::string_t qualifier, utility::string_t
 	}
 }
 
+void glslShader::addProjectionUniformBuffer(int& uniformLayoutLocation)
+{
+	_declarations += U("layout( std140, binding = 0 ) uniform viewProjectionUniformBuffer \n\
+	{\n\
+		layout(offset = 0) mat4 u_viewMatrix;\n\
+		layout(offset = 64) mat4 u_viewInverseMatrix;\n\
+		layout(offset = 128) mat4 u_projectionMatrix;\n\
+		layout(offset = 192) mat4 u_projectionInverseMatrix;\n\
+	};\n");
+
+	uniformLayoutLocation++;
+}
+
+void glslShader::addJointUniformBuffer(int& uniformLayoutLocation)
+{
+	// fixme: jointMat length
+	_declarations += U("layout( std140, binding = 1 ) uniform jointUniformBuffer \n\
+	{\n\
+		layout(offset = 0) mat4 u_jointMat;\n\
+	};\n");
+
+	uniformLayoutLocation++;
+}
+
+void glslShader::addJointUniformBuffer()
+{
+
+}
+
+int GetVertexAttributeLocation(utility::string_t& symbol)
+{
+	int layoutLocation = 0;
+
+	if (symbol.compare(U("a_position")) == 0)
+	{
+		layoutLocation = 0;
+	}
+	else if (symbol.compare(U("a_normal")) == 0)
+	{
+		layoutLocation = 1;
+	}
+	else if (symbol.compare(U("a_texcoord0")) == 0)
+	{
+		layoutLocation = 2;
+	}
+	else
+	{
+		assert("there is vertex attribute has not been supported!!!");
+	}
+
+	return layoutLocation;
+}
+
+int GetVertexVaryingLocation(utility::string_t& symbol)
+{
+	int layoutLocation = 0;
+	if (symbol.compare(U("v_fragColor")) == 0)
+	{
+		layoutLocation = 0; // out 0
+	}
+	else if (symbol.compare(U("v_position")) == 0)
+	{
+		layoutLocation = 0; // in 0
+	}
+	else if (symbol.compare(U("v_normal")) == 0)
+	{
+		layoutLocation = 1; // in 1
+	}
+	else if (symbol.compare(U("v_texcoord0")) == 0)
+	{
+		layoutLocation = 2; // in 2
+	}
+	else
+	{
+		assert("there is vertex attribute has not been supported!!!");
+	}
+
+	return layoutLocation;
+}
+
 void glslShader::addAttribute (utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
+	
 	symbol =U("a_") +  symbol ;
-	_addDeclaration (U("attribute"), symbol, type, count, forcesAsAnArray) ;
+
+	utility::string_t qualifier = U("layout( location = ");
+	qualifier += utility::conversions::to_string_t( GetVertexAttributeLocation(symbol) );
+	qualifier += U(" ) in");
+
+	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
 }
 
-void glslShader::addUniform (utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
+void glslShader::addUniform (utility::string_t symbol, unsigned int type, int& uniformLayoutLocation, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
 	symbol =U("u_") +  symbol ;
-	_addDeclaration (U("uniform"), symbol, type, count, forcesAsAnArray) ;
+
+	utility::string_t qualifier = U("layout( location = ");
+	qualifier += utility::conversions::to_string_t( uniformLayoutLocation++ );
+	qualifier += U(" ) uniform");
+
+	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
 }
 
-void glslShader::addVarying (utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
+void glslShader::addVaryingOut (utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
 	symbol =U("v_") +  symbol ;
-	_addDeclaration (U("varying"), symbol, type, count, forcesAsAnArray) ;
+	
+	utility::string_t qualifier = U("layout( location = ");
+	qualifier += utility::conversions::to_string_t( GetVertexVaryingLocation(symbol) );
+	qualifier += U(" ) out");
+
+	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
+}
+
+void glslShader::addVaryingIn(utility::string_t symbol, unsigned int type, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
+	symbol = U("v_") + symbol;
+
+	utility::string_t qualifier = U("layout( location = ");
+	qualifier += utility::conversions::to_string_t(GetVertexVaryingLocation(symbol));
+	qualifier += U(" ) in");
+
+	_addDeclaration(qualifier, symbol, type, count, forcesAsAnArray);
 }
 
 bool glslShader::hasSymbol (const utility::string_t &symbol) {
@@ -132,7 +269,7 @@ utility::string_t glslShader::body () {
 
 //-----------------------------------------------------------------------------
 glslTech::glslTech (web::json::value technique, web::json::value values, web::json::value gltf, const utility::char_t *glslVersion)
-	: _vertexShader (glslVersion), _fragmentShader (glslVersion),
+	: _vertexShader (glslShader::ShaderType::Vertex, glslVersion), _fragmentShader (glslShader::ShaderType::Fragment, glslVersion),
 	_bHasNormals (false), _bHasJoint (false), _bHasWeight (false), _bHasSkin (false), _bHasTexTangent (false), _bHasTexBinormal (false),
 	_bModelContainsLights (false), _bLightingIsEnabled (false), _bHasAmbientLight (false), _bHasSpecularLight (false), _bHasNormalMap (false)
 {
@@ -231,6 +368,23 @@ const utility::string_t glslTech::needsVarying (const utility::char_t *semantic)
 }
 
 void glslTech::prepareParameters (web::json::value technique) {
+
+	//
+	// Uniform buffer
+	//
+	_vertexShader.addProjectionUniformBuffer( _uniformLayoutLocation );
+
+	//
+	// model and modelInverse uniforms
+	//
+	_vertexShader.addUniform(U("modelMatrix"), glTF::IOglTF::FLOAT_MAT4, _uniformLayoutLocation);
+	_vertexShader.addUniform(U("modelInverseMatrix"), glTF::IOglTF::FLOAT_MAT4, _uniformLayoutLocation);
+
+	//
+	// fragColor
+	//
+	_fragmentShader.addVaryingOut(U("fragColor"), glTF::IOglTF::FLOAT_VEC4);
+
 	// Parameters / attribute - uniforms - varying
 	web::json::value parameters =technique [U("parameters")] ;
 	for ( auto iter =parameters.as_object ().begin () ; iter != parameters.as_object ().end () ; iter++ ) {
@@ -241,23 +395,28 @@ void glslTech::prepareParameters (web::json::value technique) {
 			if ( bIsAttribute )
 				_vertexShader.addAttribute (iter->first, iType) ;
 			else
-				 if(iter->first == U("jointMat") ) {
-					unsigned int matSize =iter->second.as_object () [U("count")].as_integer () ;
-					utility::string_t jointMat =glslTech::format (U("%s[%d]"), iter->first.c_str(), matSize) ;
-					_vertexShader.addUniform (jointMat, iType) ;
-				 } else 
-					_vertexShader.addUniform (iter->first, iType) ;
+				 if(iter->first == U("jointMat") || iter->first == U("modelViewMatrix") || iter->first == U("projectionMatrix") ) 
+				 {
+					//unsigned int matSize =iter->second.as_object () [U("count")].as_integer () ;
+					//utility::string_t jointMat =glslTech::format (U("%s[%d]"), iter->first.c_str(), matSize) ;
+					//_vertexShader.addUniform (jointMat, iType, _uniformLayoutLocation) ;
+					//_uniformLayoutLocation += 17;
+				 }
+				 else
+				 {
+					 _vertexShader.addUniform(iter->first, iType, _uniformLayoutLocation);
+				 }
 			utility::string_t v =needsVarying (iter->first.c_str ()) ;
 			if ( v != U("") ) {
-				_vertexShader.addVarying (iter->first, iType) ;
-				_fragmentShader.addVarying (iter->first, iType) ;
+				_vertexShader.addVaryingOut (iter->first, iType) ;
+				_fragmentShader.addVaryingIn (iter->first, iType) ;
 			}
 		}
 		if ( glslTech::isFragmentShaderSemantic (iter->first.c_str ()) ) {
 			if ( bIsAttribute )
 				_fragmentShader.addAttribute (iter->first, iType) ;
 			else
-				_fragmentShader.addUniform (iter->first, iType) ;
+				_fragmentShader.addUniform (iter->first, iType, _uniformLayoutLocation) ;
 		}
 
 		if ( iter->second.has_field (U("semantic")) ) {
@@ -270,6 +429,10 @@ void glslTech::prepareParameters (web::json::value technique) {
 		}
 	}
 	_bHasSkin =_bHasJoint && _bHasWeight ;
+	if (_bHasSkin)
+	{
+		_vertexShader.addJointUniformBuffer(_uniformLayoutLocation);
+	}
 }
 
 void glslTech::hwSkinning () {
@@ -279,13 +442,13 @@ void glslTech::hwSkinning () {
 		_vertexShader.appendCode (U("skinMat +=a_weight.y * u_jointMat [int(a_joint.y)] ;\n")) ;
 		_vertexShader.appendCode (U("skinMat +=a_weight.z * u_jointMat [int(a_joint.z)] ;\n")) ;
 		_vertexShader.appendCode (U("skinMat +=a_weight.w * u_jointMat [int(a_joint.w)] ;\n")) ;
-		_vertexShader.appendCode (U("vec4 pos =u_modelViewMatrix * skinMat * vec4(a_position, 1.0) ;\n")) ;
+		_vertexShader.appendCode (U("vec4 pos = u_viewMatrix * u_modelMatrix * skinMat * vec4(a_position, 1.0) ;\n")) ;
 		if ( _bHasNormals )
-			_vertexShader.appendCode (U("v_normal =u_normalMatrix * mat3(skinMat) * a_normal ;\n")) ;
+			_vertexShader.appendCode (U("v_normal = u_normalMatrix * mat3(skinMat) * a_normal ;\n")) ;
 	} else {
-		_vertexShader.appendCode (U("vec4 pos =u_modelViewMatrix * vec4(a_position, 1.0) ;\n")) ;
+		_vertexShader.appendCode (U("vec4 pos = u_viewMatrix * u_modelMatrix * vec4 ( a_position, 1.0 ) ;\n")) ;
 		if ( _bHasNormals )
-			_vertexShader.appendCode (U("v_normal =u_normalMatrix * a_normal ;\n")) ;
+			_vertexShader.appendCode (U("v_normal = transpose( mat3( u_viewInverseMatrix ) ) * transpose( mat3( u_modelInverseMatrix ) ) * a_normal;\n")) ; // fixme:
 	}
 }
 
@@ -398,7 +561,7 @@ void glslTech::texcoords (web::json::value technique) {
 			//_fragmentShader.addUniform (texVSymbol, textureParameter [U("type")].as_integer ()) ;
 			if ( _bHasNormalMap == false && slot == U("bump") )
 				continue ;
-			_fragmentShader.appendCode (U("%s =texture2D (%s, %s) ;\n"), slot.c_str (), textureSymbol.c_str (), texVSymbol.c_str ()) ;
+			_fragmentShader.appendCode (U("%s = texture (%s, %s) ;\n"), slot.c_str (), textureSymbol.c_str (), texVSymbol.c_str ()) ;
 		}
 	}
 
@@ -470,8 +633,8 @@ void glslTech::lighting2 (web::json::value technique, web::json::value gltf) {
 					_fragmentShader.appendCode (U("}\n")) ;
 				} else {
 					utility::string_t szVaryingLightDirection =glslTech::format (U("%sDirection"), szLightIndex.c_str ()) ;
-					_vertexShader.addVarying (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
-					_fragmentShader.addVarying (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
+					_vertexShader.addVaryingOut (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
+					_fragmentShader.addVaryingIn (szVaryingLightDirection, IOglTF::FLOAT_VEC3) ;
 					if (   /*_vertexShader.hasSymbol (U("v_position")) == false
 						&&*/ (lightingModel == U("Phong") || lightingModel == U("Blinn") || lightType == U("spot"))
 					) {
@@ -593,7 +756,7 @@ void glslTech::finalizingShaders (web::json::value technique, web::json::value g
 	else
 		_fragmentShader.appendCode (U("color =vec4(color.rgb * diffuse.a, diffuse.a) ;\n")) ;
 
-	_fragmentShader.appendCode (U("gl_FragColor =color ;\n")) ;
+	_fragmentShader.appendCode (U("v_fragColor = color ;\n")) ;
 	_vertexShader.appendCode (U("gl_Position =u_projectionMatrix * pos ;\n")) ;
 }
 
