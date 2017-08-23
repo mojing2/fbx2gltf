@@ -10,7 +10,6 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 message (STATUS "Ouput Directory: " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-#add_subdirectory( $ENV{VK_SDK_PATH}/shaderc shaderc )
 add_subdirectory( ./IO-glTF IO-glTF )
 
 #
