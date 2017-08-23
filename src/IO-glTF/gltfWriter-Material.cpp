@@ -308,7 +308,7 @@ web::json::value gltfWriter::WritePhongMaterial (FbxNode *pNode, FbxSurfaceMater
 	web::json::value ret =web::json::value::object () ;
 	//MergeJsonObjects (ret, WriteMaterialParameter (U("ambient"), pPhongSurface->Ambient, pPhongSurface->AmbientFactor.Get (), values, techniqueParameters)) ;
 	MergeJsonObjects (ret, WriteMaterialParameter (U("diffuse"), pPhongSurface->Diffuse, pPhongSurface->DiffuseFactor.Get (), values, techniqueParameters)) ;
-	MergeJsonObjects (ret, WriteMaterialParameter (U("emission"), pPhongSurface->Emissive, pPhongSurface->EmissiveFactor.Get (), values, techniqueParameters)) ;
+	//MergeJsonObjects (ret, WriteMaterialParameter (U("emission"), pPhongSurface->Emissive, pPhongSurface->EmissiveFactor.Get (), values, techniqueParameters)) ;
 	MergeJsonObjects (ret, WriteMaterialParameter (U("specular"), pPhongSurface->Specular, pPhongSurface->SpecularFactor.Get (), values, techniqueParameters)) ;
 	//MergeJsonObjects (ret, WriteMaterialParameter (U("shininess"), pPhongSurface->Shininess, values, techniqueParameters)) ;
 	MergeJsonObjects (ret, WriteMaterialParameter (U("reflective"), pPhongSurface->Reflection, 1., values, techniqueParameters)) ;
@@ -318,11 +318,11 @@ web::json::value gltfWriter::WritePhongMaterial (FbxNode *pNode, FbxSurfaceMater
 	// gltf - opaque is 1. / transparency is 0.
 	// pPhongSurface->TransparentColor // Transparent color property.
 	// pPhongSurface->TransparencyFactor // Transparency factor property. This property is used to make a surface more or less opaque (0 = opaque, 1 = transparent).
-	MergeJsonObjects (ret, WriteMaterialTransparencyParameter (
-		U("transparency"),
-		pPhongSurface->TransparencyFactor, pPhongSurface->TransparentColor, pPhongSurface->FindProperty ("Opacity"),
-		values, techniqueParameters
-	)) ;
+	//MergeJsonObjects (ret, WriteMaterialTransparencyParameter (
+	//	U("transparency"),
+	//	pPhongSurface->TransparencyFactor, pPhongSurface->TransparentColor, pPhongSurface->FindProperty ("Opacity"),
+	//	values, techniqueParameters
+	//)) ;
 
 	// todo bumpScale? https://github.com/zfedoran/convert-to-threejs-json/blob/master/convert_to_threejs.py #364
 	// 		eTextureNormalMap,
@@ -438,7 +438,7 @@ web::json::value gltfWriter::WriteBlinnShadingModelMaterial (FbxNode *pNode, Fbx
 	web::json::value ret =web::json::value::object () ;
 	//MergeJsonObjects (ret, WriteMaterialParameter (U("ambient"), pMaterial, FbxSurfaceMaterial::sAmbient, FbxSurfaceMaterial::sAmbientFactor, values, techniqueParameters)) ;
 	MergeJsonObjects (ret, WriteMaterialParameter (U("diffuse"), pMaterial, FbxSurfaceMaterial::sDiffuse, FbxSurfaceMaterial::sDiffuseFactor, values, techniqueParameters)) ;
-	MergeJsonObjects (ret, WriteMaterialParameter (U("emission"), pMaterial, FbxSurfaceMaterial::sEmissive, FbxSurfaceMaterial::sEmissiveFactor, values, techniqueParameters)) ;
+	//MergeJsonObjects (ret, WriteMaterialParameter (U("emission"), pMaterial, FbxSurfaceMaterial::sEmissive, FbxSurfaceMaterial::sEmissiveFactor, values, techniqueParameters)) ;
 	//MergeJsonObjects (ret, WriteMaterialParameter (U("specular"), pMaterial, FbxSurfaceMaterial::sSpecular, FbxSurfaceMaterial::sSpecularFactor, values, techniqueParameters)) ;
 	FbxPropertyT<FbxDouble> factorProperty =pMaterial->FindProperty (FbxSurfaceMaterial::sShininess, FbxDoubleDT, false) ;
 	//MergeJsonObjects (ret, WriteMaterialParameter (U("shininess"), factorProperty, values, techniqueParameters)) ;
@@ -453,11 +453,11 @@ web::json::value gltfWriter::WriteBlinnShadingModelMaterial (FbxNode *pNode, Fbx
 	// pPhongSurface->TransparentColor // Transparent color property.
 	// pPhongSurface->TransparencyFactor // Transparency factor property. This property is used to make a surface more or less opaque (0 = opaque, 1 = transparent).
 	factorProperty =pMaterial->FindProperty (FbxSurfaceMaterial::sTransparencyFactor, FbxDoubleDT, false) ;
-	MergeJsonObjects (ret, WriteMaterialTransparencyParameter (
-		U("transparency"),
-		factorProperty, colorProperty, pMaterial->FindProperty ("Opacity"),
-		values, techniqueParameters
-	)) ;
+	//MergeJsonObjects (ret, WriteMaterialTransparencyParameter (
+	//	U("transparency"),
+	//	factorProperty, colorProperty, pMaterial->FindProperty ("Opacity"),
+	//	values, techniqueParameters
+	//)) ;
 
 	// Note: 
 	// INDEXOFREFRACTION is not supported by FBX.

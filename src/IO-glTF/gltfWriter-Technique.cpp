@@ -24,21 +24,21 @@
 namespace _IOglTF_NS_ {
 
 void gltfWriter::AdditionalTechniqueParameters (FbxNode *pNode, web::json::value &techniqueParameters, bool bHasNormals /*=false*/, bool hasSkinning /*=false*/) {
-	if ( bHasNormals ) {
-		techniqueParameters [U("normalMatrix")] =web::json::value::object ({ // normal matrix
-			{ U("semantic"), web::json::value::string (U("MODELVIEWINVERSETRANSPOSE")) },
-			{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT3) }
-		}) ;
-	}
+	//if ( bHasNormals ) {
+	//	techniqueParameters [U("normalMatrix")] =web::json::value::object ({ // normal matrix
+	//		{ U("semantic"), web::json::value::string (U("MODELVIEWINVERSETRANSPOSE")) },
+	//		{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT3) }
+	//	}) ;
+	//}
 	// todo:
-	techniqueParameters [U("modelViewMatrix")] =web::json::value::object ({ // modeliew matrix
-		{ U("semantic"), web::json::value::string (U("MODELVIEW")) },
-		{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
-	}) ;
-	techniqueParameters [U("projectionMatrix")] =web::json::value::object ({ // projection matrix
-		{ U("semantic"), web::json::value::string (U("PROJECTION")) },
-		{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
-	}) ;
+	//techniqueParameters [U("modelViewMatrix")] =web::json::value::object ({ // modeliew matrix
+	//	{ U("semantic"), web::json::value::string (U("MODELVIEW")) },
+	//	{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
+	//}) ;
+	//techniqueParameters [U("projectionMatrix")] =web::json::value::object ({ // projection matrix
+	//	{ U("semantic"), web::json::value::string (U("PROJECTION")) },
+	//	{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT4) }
+	//}) ;
 
 //d:\projects\gltf\converter\collada2gltf\shaders\commonprofileshaders.cpp #905
 	if ( hasSkinning ) {
