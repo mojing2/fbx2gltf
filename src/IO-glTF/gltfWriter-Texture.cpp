@@ -72,9 +72,10 @@ web::json::value gltfWriter::WriteTexture (FbxTexture *pTexture) {
 		cmd += inImagePath;
 		cmd += U(" -o ");
 		cmd += outImagePath;
-		cmd += U(" -f ETC2_RGB -q etcfast -m ");
-		//cmd += U(" -f BC3 -m ");
+		//cmd += U(" -f ETC2_RGBA -q etcfast -m 9");
+		//cmd += U(" -f BC3 ");
 		//cmd += U(" -f ASTC_6x6 -q astcfast ");
+		cmd += U(" -f r8g8b8a8 ");
 
 		wchar_t scriptPath[1024];
 		int bytes = GetModuleFileName(NULL, scriptPath, 1024);
