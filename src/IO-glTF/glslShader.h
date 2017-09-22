@@ -51,6 +51,7 @@ protected:
 	void _addDeclaration (utility::string_t qualifier, utility::string_t symbol, unsigned int type, size_t count, bool forcesAsAnArray =false) ;
 	utility::string_t body () ;
 public:
+	void addModelUniformBuffer(int& uniformLayoutLocation);
 	void addProjectionUniformBuffer(int& uniformLayoutLocation);
 	void addJointUniformBuffer(int& uniformLayoutLocation);
 	void addJointUniformBuffer();

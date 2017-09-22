@@ -21,6 +21,8 @@
 #include "StdAfx.h"
 #include "glslShader.h"
 
+#define USE_MODEL_UNIFORM_BUFFER 1
+
 namespace _IOglTF_NS_ {
 
 //utility::string_t vs [8] ={
@@ -92,9 +94,20 @@ void glslShader::_addDeclaration (utility::string_t qualifier, utility::string_t
 	}
 }
 
+void glslShader::addModelUniformBuffer(int& uniformLayoutLocation)
+{
+	_declarations += U("layout( std140, binding = 0 ) uniform modelUniformBuffer \n\
+	{\n\
+		layout(offset = 0) mat4 u_modelMatrix;\n\
+		layout(offset = 64) mat4 u_modelInverseMatrix;\n\
+	};\n");
+
+	uniformLayoutLocation++;
+}
+
 void glslShader::addProjectionUniformBuffer(int& uniformLayoutLocation)
 {
-	_declarations += U("layout( std140, binding = 0 ) uniform viewProjectionUniformBuffer \n\
+	_declarations += U("layout( std140, binding = 1 ) uniform viewProjectionUniformBuffer \n\
 	{\n\
 		layout(offset = 0) mat4 u_viewMatrix;\n\
 		layout(offset = 64) mat4 u_viewInverseMatrix;\n\
@@ -108,7 +121,7 @@ void glslShader::addProjectionUniformBuffer(int& uniformLayoutLocation)
 void glslShader::addJointUniformBuffer(int& uniformLayoutLocation)
 {
 	// fixme: jointMat length
-	_declarations += U("layout( std140, binding = 1 ) uniform jointUniformBuffer \n\
+	_declarations += U("layout( std140, binding = 2 ) uniform jointUniformBuffer \n\
 	{\n\
 		layout(offset = 0) mat4 u_jointMat;\n\
 	};\n");
@@ -372,13 +385,13 @@ void glslTech::prepareParameters (web::json::value technique) {
 	//
 	// Uniform buffer
 	//
-	_vertexShader.addProjectionUniformBuffer( _uniformLayoutLocation );
-
-	//
-	// model and modelInverse uniforms
-	//
+#if defined( USE_MODEL_UNIFORM_BUFFER )
+	_vertexShader.addModelUniformBuffer(_uniformLayoutLocation);
+#else
 	_vertexShader.addUniform(U("modelMatrix"), glTF::IOglTF::FLOAT_MAT4, _uniformLayoutLocation);
 	_vertexShader.addUniform(U("modelInverseMatrix"), glTF::IOglTF::FLOAT_MAT4, _uniformLayoutLocation);
+#endif
+	_vertexShader.addProjectionUniformBuffer( _uniformLayoutLocation );
 
 	//
 	// fragColor

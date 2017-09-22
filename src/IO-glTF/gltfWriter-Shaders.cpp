@@ -21,7 +21,6 @@
 #include "StdAfx.h"
 #include "gltfWriter.h"
 #include "glslShader.h"
-#include "shaderc/shaderc.hpp"
 
 namespace _IOglTF_NS_ {
 

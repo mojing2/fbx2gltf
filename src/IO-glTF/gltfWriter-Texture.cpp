@@ -72,7 +72,7 @@ web::json::value gltfWriter::WriteTexture (FbxTexture *pTexture) {
 		cmd += inImagePath;
 		cmd += U(" -o ");
 		cmd += outImagePath;
-		cmd += U(" -f ETC2_RGB -q etcfast ");
+		cmd += U(" -f ETC2_RGB -q etcfast -m ");
 		//cmd += U(" -f BC3 -m ");
 		//cmd += U(" -f ASTC_6x6 -q astcfast ");
 
