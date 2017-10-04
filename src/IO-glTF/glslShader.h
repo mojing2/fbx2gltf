@@ -89,7 +89,7 @@ class glslTech {
 	bool _bHasSpecularLight ;
 	bool _bHasNormalMap ;
 	
-	int _uniformLayoutLocation = 0;
+	int _uniformBindings = 0;
 
 protected:
 	glslShader _vertexShader ;

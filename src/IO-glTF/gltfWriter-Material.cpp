@@ -283,7 +283,16 @@ web::json::value gltfWriter::WriteMaterialParameter (const utility::char_t *pszN
 		}
 		else
 		{
-			techniqueParameters[pszName] = web::json::value::object({ { U("type"), IOglTF::SAMPLER_2D } });
+			web::json::value uniformStageValue = web::json::value::object({ { U("stage"), web::json::value::number(35632) } });
+			web::json::value uniformStageExtension = web::json::value::object({ { U("KHR_technique_uniform_stages"), uniformStageValue } });
+			//web::json::value extensionsValues = web::json::value::array({ { uniformStageExtension } });
+
+			techniqueParameters[pszName] = web::json::value::object({ 
+				{
+					{ U("type"), IOglTF::SAMPLER_2D },
+					{ U("extensions"),  web::json::value::array({ { uniformStageExtension } }) }
+				} 
+			});
 		}
 		
 		ret =WriteTexture (pTexture) ;
