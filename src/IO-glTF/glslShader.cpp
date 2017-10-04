@@ -94,7 +94,7 @@ void glslShader::_addDeclaration (utility::string_t qualifier, utility::string_t
 	}
 }
 
-void glslShader::addModelUniformBuffer(int& uniformLayoutLocation)
+void glslShader::addModelUniformBuffer(int& uniformBindings)
 {
 	_declarations += U("layout( std140, binding = 0 ) uniform modelUniformBuffer \n\
 	{\n\
@@ -102,10 +102,10 @@ void glslShader::addModelUniformBuffer(int& uniformLayoutLocation)
 		layout(offset = 64) mat4 u_modelInverseMatrix;\n\
 	};\n");
 
-	uniformLayoutLocation++;
+	uniformBindings++;
 }
 
-void glslShader::addProjectionUniformBuffer(int& uniformLayoutLocation)
+void glslShader::addProjectionUniformBuffer(int& uniformBindings)
 {
 	_declarations += U("layout( std140, binding = 1 ) uniform viewProjectionUniformBuffer \n\
 	{\n\
@@ -115,7 +115,7 @@ void glslShader::addProjectionUniformBuffer(int& uniformLayoutLocation)
 		layout(offset = 192) mat4 u_projectionInverseMatrix;\n\
 	};\n");
 
-	uniformLayoutLocation++;
+	uniformBindings++;
 }
 
 void glslShader::addJointUniformBuffer(int& uniformLayoutLocation)
@@ -196,11 +196,11 @@ void glslShader::addAttribute (utility::string_t symbol, unsigned int type, size
 	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
 }
 
-void glslShader::addUniform (utility::string_t symbol, unsigned int type, int& uniformLayoutLocation, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
+void glslShader::addUniform (utility::string_t symbol, unsigned int type, int& uniformBindings, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
 	symbol =U("u_") +  symbol ;
 
-	utility::string_t qualifier = U("layout( location = ");
-	qualifier += utility::conversions::to_string_t( uniformLayoutLocation++ );
+	utility::string_t qualifier = U("layout( binding = ");
+	qualifier += utility::conversions::to_string_t(uniformBindings++ );
 	qualifier += U(" ) uniform");
 
 	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
@@ -386,12 +386,12 @@ void glslTech::prepareParameters (web::json::value technique) {
 	// Uniform buffer
 	//
 #if defined( USE_MODEL_UNIFORM_BUFFER )
-	_vertexShader.addModelUniformBuffer(_uniformLayoutLocation);
+	_vertexShader.addModelUniformBuffer(_uniformBindings);
 #else
 	_vertexShader.addUniform(U("modelMatrix"), glTF::IOglTF::FLOAT_MAT4, _uniformLayoutLocation);
 	_vertexShader.addUniform(U("modelInverseMatrix"), glTF::IOglTF::FLOAT_MAT4, _uniformLayoutLocation);
 #endif
-	_vertexShader.addProjectionUniformBuffer( _uniformLayoutLocation );
+	_vertexShader.addProjectionUniformBuffer( _uniformBindings );
 
 	//
 	// fragColor
@@ -417,7 +417,7 @@ void glslTech::prepareParameters (web::json::value technique) {
 				 }
 				 else
 				 {
-					 _vertexShader.addUniform(iter->first, iType, _uniformLayoutLocation);
+					 _vertexShader.addUniform(iter->first, iType, _uniformBindings);
 				 }
 			utility::string_t v =needsVarying (iter->first.c_str ()) ;
 			if ( v != U("") ) {
@@ -429,7 +429,7 @@ void glslTech::prepareParameters (web::json::value technique) {
 			if ( bIsAttribute )
 				_fragmentShader.addAttribute (iter->first, iType) ;
 			else
-				_fragmentShader.addUniform (iter->first, iType, _uniformLayoutLocation) ;
+				_fragmentShader.addUniform (iter->first, iType, _uniformBindings) ;
 		}
 
 		if ( iter->second.has_field (U("semantic")) ) {
@@ -444,7 +444,7 @@ void glslTech::prepareParameters (web::json::value technique) {
 	_bHasSkin =_bHasJoint && _bHasWeight ;
 	if (_bHasSkin)
 	{
-		_vertexShader.addJointUniformBuffer(_uniformLayoutLocation);
+		_vertexShader.addJointUniformBuffer( _uniformBindings );
 	}
 }
 
