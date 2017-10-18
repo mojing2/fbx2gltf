@@ -54,7 +54,12 @@ namespace _IOglTF_NS_ {
 		fflush(shaderFile);
 		fclose(shaderFile);
 
-		utility::string_t PvrTexToolExe(U("D:\\app\\vulkan_sdk_1.0.54.0\\Bin\\glslc.exe"));
+		char *vkPath = getenv("VK_SDF_PATH");
+		sprintf(vkPath, "%s\\Bin\\glslc.exe", vkPath);
+		wchar_t* dest;
+		mbstowcs(dest, vkPath, sizeof(vkPath));
+		utility::string_t PvrTexToolExe(dest);
+
 		utility::string_t cmd;
 		cmd += PvrTexToolExe;
 		cmd += U(" -std=310es ");
@@ -81,6 +86,8 @@ namespace _IOglTF_NS_ {
 		assert(result != -1);
 
 		//image[name][U("uri")] = web::json::value::string(IOglTF::dataURI(outImagePath));
+		free(vkPath);
+		free(dest);
 
 		return outSpirvPath;
 	}
@@ -128,21 +135,32 @@ bool gltfWriter::WriteShaders () {
 		utility::string_t fsName =_json [U("programs")] [programName] [U("fragmentShader")].as_string () ;
 		
 		FbxString gltfFilename (utility::conversions::to_utf8string (_fileName).c_str ()) ;
-		
+
 		if ( GetIOSettings ()->GetBoolProp (IOSN_FBX_GLTF_EMBEDMEDIA, false) ) {
-			utility::string_t vertexShaderFilePath = ConvertGlslToSpirv(
+			utility::string_t vertexShaderFilePath;
+			utility::string_t fragmentShaderFilePath;
+#define IOSDISPOSE 0
+
+#if IOSDISPOSE
+			vertexShaderFilePath = ConvertGlslToSpirv(
 				tech.vertexShader().source(), 
 				vsName,
 				glslShader::ShaderType::Vertex
 			);
-			utility::string_t fragmentShaderFilePath = ConvertGlslToSpirv(
+			fragmentShaderFilePath = ConvertGlslToSpirv(
 				tech.fragmentShader().source(), 
 				fsName,
 				glslShader::ShaderType::Fragment
 			);
 			// data:[<mime type>][;charset=<charset>][;base64],<encoded data>
-			_json [U("shaders")] [vsName] [U("uri")] =web::json::value::string (IOglTF::dataURI ( vertexShaderFilePath )) ;
-			_json [U("shaders")] [fsName] [U("uri")] =web::json::value::string (IOglTF::dataURI ( fragmentShaderFilePath )) ;
+			vertexShaderFilePath = IOglTF::dataURI(vertexShaderFilePath);
+			fragmentShaderFilePath = IOglTF::dataURI(fragmentShaderFilePath);
+#else
+			vertexShaderFilePath = IOglTF::dataURI(tech.vertexShader().source(), 0);
+			fragmentShaderFilePath = IOglTF::dataURI(tech.fragmentShader().source(), 0);
+#endif
+			_json[U("shaders")][vsName][U("uri")] = web::json::value::string(vertexShaderFilePath);
+			_json[U("shaders")][fsName][U("uri")] = web::json::value::string(fragmentShaderFilePath);
 		} else {
 			utility::string_t vsFilename =_json [U("shaders")] [vsName] [U("uri")].as_string () ;
 			{

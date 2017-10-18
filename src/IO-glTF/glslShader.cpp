@@ -98,8 +98,8 @@ void glslShader::addModelUniformBuffer(int& uniformBindings)
 {
 	_declarations += U("layout( std140, binding = 0 ) uniform modelUniformBuffer \n\
 	{\n\
-		layout(offset = 0) mat4 u_modelMatrix;\n\
-		layout(offset = 64) mat4 u_modelInverseMatrix;\n\
+		mat4 u_modelMatrix;\n\
+		mat4 u_modelInverseMatrix;\n\
 	};\n");
 
 	uniformBindings++;
@@ -109,10 +109,10 @@ void glslShader::addProjectionUniformBuffer(int& uniformBindings)
 {
 	_declarations += U("layout( std140, binding = 1 ) uniform viewProjectionUniformBuffer \n\
 	{\n\
-		layout(offset = 0) mat4 u_viewMatrix;\n\
-		layout(offset = 64) mat4 u_viewInverseMatrix;\n\
-		layout(offset = 128) mat4 u_projectionMatrix;\n\
-		layout(offset = 192) mat4 u_projectionInverseMatrix;\n\
+		mat4 u_viewMatrix;\n\
+		mat4 u_viewInverseMatrix;\n\
+		mat4 u_projectionMatrix;\n\
+		mat4 u_projectionInverseMatrix;\n\
 	};\n");
 
 	uniformBindings++;
@@ -123,7 +123,7 @@ void glslShader::addJointUniformBuffer(int& uniformLayoutLocation)
 	// fixme: jointMat length
 	_declarations += U("layout( std140, binding = 2 ) uniform jointUniformBuffer \n\
 	{\n\
-		layout(offset = 0) mat4 u_jointMat;\n\
+		mat4 u_jointMat;\n\
 	};\n");
 
 	uniformLayoutLocation++;
