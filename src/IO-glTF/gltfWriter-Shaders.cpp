@@ -86,8 +86,6 @@ namespace _IOglTF_NS_ {
 		assert(result != -1);
 
 		//image[name][U("uri")] = web::json::value::string(IOglTF::dataURI(outImagePath));
-		free(vkPath);
-		free(dest);
 
 		return outSpirvPath;
 	}
