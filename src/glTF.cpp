@@ -31,6 +31,7 @@
 // -f $(ProjectDir)\..\models\wine\wine.fbx -o $(ProjectDir)\..\models\wine\out -n test -c
 // -f $(ProjectDir)\..\models\monster\monster.fbx -o $(ProjectDir)\..\models\monster\out -n test -c
 // -f $(ProjectDir)\..\models\Carnivorous_plant\Carnivorous_plant.fbx -o $(ProjectDir)\..\models\Carnivorous_plant\out -n test -c
+//  -f C:\Users\XXXXXX\Desktop\xxxxxx\Skeleton\skeletonModel\0825a.FBX -e -a
 
 	//{ U("n"), U("a"), required_argument, U("-a -> export animations, argument [bool], default:true") },
 	//{ U("n"), U("g"), required_argument, U("-g -> [experimental] GLSL version to output in generated shaders") },
@@ -40,7 +41,7 @@
 	//{ U("n"), U("n"), no_argument, U("-n -> don't combine animations with the same target") }
 
 void usage () {
-	ucout << std::endl << U("glTF [-h] [-v] [-n] [-d] [-t] [-l] [-c] [-e] [-o <output path>] -f <input file>") << std::endl ;
+	ucout << std::endl << U("glTF [-h] [-v] [-n] [-d] [-t] [-l] [-c] [-e] [-a] [-w] [-o <output path>] -f <input file>") << std::endl ;
 	ucout << U("-f/--file \t\t- file to convert to glTF [string]") << std::endl ;
 	ucout << U("-o/--output \t\t- path of output directory [string]") << std::endl ;
 	ucout << U("-n/--name \t\t- override the scene name [string]") << std::endl ;
