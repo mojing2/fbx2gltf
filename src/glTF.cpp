@@ -20,6 +20,7 @@
 //
 #include "StdAfx.h"
 #include "getopt.h"
+#include <conio.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include "tchar.h"
 #endif
@@ -31,6 +32,7 @@
 // -f $(ProjectDir)\..\models\wine\wine.fbx -o $(ProjectDir)\..\models\wine\out -n test -c
 // -f $(ProjectDir)\..\models\monster\monster.fbx -o $(ProjectDir)\..\models\monster\out -n test -c
 // -f $(ProjectDir)\..\models\Carnivorous_plant\Carnivorous_plant.fbx -o $(ProjectDir)\..\models\Carnivorous_plant\out -n test -c
+//  -f C:\Users\XXXXXX\Desktop\xxxxxx\Skeleton\skeletonModel\0825a.FBX -e -a
 
 	//{ U("n"), U("a"), required_argument, U("-a -> export animations, argument [bool], default:true") },
 	//{ U("n"), U("g"), required_argument, U("-g -> [experimental] GLSL version to output in generated shaders") },
@@ -40,7 +42,7 @@
 	//{ U("n"), U("n"), no_argument, U("-n -> don't combine animations with the same target") }
 
 void usage () {
-	ucout << std::endl << U("glTF [-h] [-v] [-n] [-d] [-t] [-l] [-c] [-e] [-o <output path>] -f <input file>") << std::endl ;
+	ucout << std::endl << U("glTF [-h] [-v] [-n] [-d] [-t] [-l] [-c] [-e] [-a] [-w] [-o <output path>] -f <input file>") << std::endl ;
 	ucout << U("-f/--file \t\t- file to convert to glTF [string]") << std::endl ;
 	ucout << U("-o/--output \t\t- path of output directory [string]") << std::endl ;
 	ucout << U("-n/--name \t\t- override the scene name [string]") << std::endl ;
@@ -51,6 +53,8 @@ void usage () {
 	ucout << U("-e/--embed \t\t- embed all resources as Data URIs (cannot be combined with --copy)") << std::endl ;
 	ucout << U("-h/--help \t\t- this message") << std::endl ;
 	ucout << U("-v/--version \t\t- version") << std::endl ;
+	ucout << U("-a/--android \t\t- android platform") << std::endl;
+	ucout << U("-w/--wondows \t\t- windows platform") << std::endl;
 }
 static struct option long_options [] ={
 	{ U("file"), ARG_REQ, 0, U('f') },
@@ -63,6 +67,8 @@ static struct option long_options [] ={
 	{ U("embed"), ARG_NONE, 0, U('e') },
 	{ U("help"), ARG_NONE, 0, U('h') },
 	{ U("version"), ARG_NONE, 0, U('v') },
+	{ U("android_platform"), ARG_NONE, 0, U('a') },
+	{ U("windows_platform"), ARG_NONE, 0, U('w') },
 
 	{ ARG_NULL, ARG_NULL, ARG_NULL, ARG_NULL }
 } ;
@@ -81,12 +87,17 @@ int main (int argc, char *argv []) {
 	bool defaultLighting =false ;
 	bool copyMedia =false ;
 	bool embedMedia =false ;
+
+	FILE *fp;
+	fp = fopen("config.log", "w");
+
 	while ( bLoop ) {
 		int option_index =0 ;
 		// http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
 		// http://www.gnu.org/software/libc/manual/html_node/Argp-Examples.html#Argp-Examples
 		// http://stackoverflow.com/questions/13251732/c-how-to-specify-an-optstring-in-the-getopt-function
-		int c =getopt_long (argc, argv, U ("f:o:n:tlcehv"), long_options, &option_index) ;
+		int c =getopt_long (argc, argv, U ("f:o:n:tlcehvaw"), long_options, &option_index) ;
+		//printf("%c", c);
 		// Check for end of operation or error
 		if ( c == -1 )
 			break ;
@@ -132,8 +143,18 @@ int main (int argc, char *argv []) {
 			case U('e'): // embed all resources as Data URIs (cannot be combined with --copy)
 				embedMedia =!copyMedia ;
 				break ;
+			case U('a'): // android platform
+				//printf("android platform\n");
+				fwrite("android_platform", strlen("android_platform"), 1, fp);
+				break;
+			case U('w'): // windows platform
+				//printf("pc platform\n");
+				fwrite("windows_platform", strlen("windows_platform"), 1, fp);
+				break;
 		}
 	}
+	fclose(fp);
+
 #if defined(_WIN32) || defined(_WIN64)
 	if ( inFile.length () == 0  || _taccess_s (inFile.c_str (), 0) == ENOENT )
 		return (-1) ;
@@ -159,6 +180,7 @@ int main (int argc, char *argv []) {
 	ucout << U("Converting to GLTF ...") << std::endl ;
 	bRet =asset->save (outDir) ;
 	ucout << U("done!") << std::endl ;
+	_getch();
 	return (0) ;
 }
 
