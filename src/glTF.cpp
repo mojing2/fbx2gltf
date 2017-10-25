@@ -20,6 +20,7 @@
 //
 #include "StdAfx.h"
 #include "getopt.h"
+#include <conio.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include "tchar.h"
 #endif
@@ -179,6 +180,7 @@ int main (int argc, char *argv []) {
 	ucout << U("Converting to GLTF ...") << std::endl ;
 	bRet =asset->save (outDir) ;
 	ucout << U("done!") << std::endl ;
+	_getch();
 	return (0) ;
 }
 

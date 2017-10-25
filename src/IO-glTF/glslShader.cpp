@@ -199,9 +199,16 @@ void glslShader::addAttribute (utility::string_t symbol, unsigned int type, size
 void glslShader::addUniform (utility::string_t symbol, unsigned int type, int& uniformBindings, size_t count /*=1*/, bool forcesAsAnArray /*=false*/) {
 	symbol =U("u_") +  symbol ;
 
-	utility::string_t qualifier = U("layout( binding = ");
-	qualifier += utility::conversions::to_string_t(uniformBindings++ );
-	qualifier += U(" ) uniform");
+	utility::string_t qualifier = U("");
+	utility::string_t szType = IOglTF::glslShaderType(type);
+	if (szType == U("sampler2D")) {
+		qualifier += U("layout( binding = ");
+		qualifier += utility::conversions::to_string_t(uniformBindings++);
+		qualifier += U(" ) uniform");
+	}
+	else {
+		qualifier += U("uniform");
+	}
 
 	_addDeclaration (qualifier, symbol, type, count, forcesAsAnArray) ;
 }
