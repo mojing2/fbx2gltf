@@ -20,7 +20,6 @@
 //
 #include "StdAfx.h"
 #include "getopt.h"
-#include <conio.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include "tchar.h"
 #endif
@@ -55,6 +54,7 @@ void usage () {
 	ucout << U("-v/--version \t\t- version") << std::endl ;
 	ucout << U("-a/--android \t\t- android platform") << std::endl;
 	ucout << U("-w/--wondows \t\t- windows platform") << std::endl;
+	ucout << U("-i/--ios \t\t- ios platform") << std::endl;
 }
 static struct option long_options [] ={
 	{ U("file"), ARG_REQ, 0, U('f') },
@@ -69,6 +69,7 @@ static struct option long_options [] ={
 	{ U("version"), ARG_NONE, 0, U('v') },
 	{ U("android_platform"), ARG_NONE, 0, U('a') },
 	{ U("windows_platform"), ARG_NONE, 0, U('w') },
+	{ U("ios_platform"), ARG_NONE, 0, U('i') },
 
 	{ ARG_NULL, ARG_NULL, ARG_NULL, ARG_NULL }
 } ;
@@ -96,7 +97,7 @@ int main (int argc, char *argv []) {
 		// http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
 		// http://www.gnu.org/software/libc/manual/html_node/Argp-Examples.html#Argp-Examples
 		// http://stackoverflow.com/questions/13251732/c-how-to-specify-an-optstring-in-the-getopt-function
-		int c =getopt_long (argc, argv, U ("f:o:n:tlcehvaw"), long_options, &option_index) ;
+		int c =getopt_long (argc, argv, U ("f:o:n:tlcehvawi"), long_options, &option_index) ;
 		//printf("%c", c);
 		// Check for end of operation or error
 		if ( c == -1 )
@@ -151,6 +152,10 @@ int main (int argc, char *argv []) {
 				//printf("pc platform\n");
 				fwrite("windows_platform", strlen("windows_platform"), 1, fp);
 				break;
+			case U('i'): // windows platform
+						 //printf("ios platform\n");
+				fwrite("ios_platform", strlen("ios_platform"), 1, fp);
+				break;
 		}
 	}
 	fclose(fp);
@@ -180,7 +185,7 @@ int main (int argc, char *argv []) {
 	ucout << U("Converting to GLTF ...") << std::endl ;
 	bRet =asset->save (outDir) ;
 	ucout << U("done!") << std::endl ;
-	_getch();
+
 	return (0) ;
 }
 

@@ -78,19 +78,19 @@ web::json::value gltfWriter::WriteTexture (FbxTexture *pTexture) {
 		char *platformType = "android_platform";
 		if (fp != NULL) {
 			fprintf(fp, "%s", platformType);
-			if (strcmp(platformType, "android_platform") == 0) {
-				cmd += U(" -f ASTC_4x4 -q astcfast ");//Android
+			if (strcmp(platformType, "android_platform") == 0 || strcmp(platformType, "ios_platform") == 0) {
+				cmd += U(" -f ASTC_6x6 -q astcfast ");//Android or ios
 			}
 			else if (strcmp(platformType, "windows_platform") == 0) {
 				cmd += U(" -f BC3 ");//Windows
 			}
 			else {
-				cmd += U(" -f ASTC_4x4 -q astcfast ");//Android
+				cmd += U(" -f ASTC_6x6 -q astcfast ");//Android //ETC2_RGB
 				ucout << U("Unread the compressed format file information!The default format is ASTC_4x4(Android platform)!") << std::endl;
 			}
 		}
 		else {
-			cmd += U(" -f ASTC_4x4 -q astcfast ");//Android
+			cmd += U(" -f ASTC_6x6 -q astcfast ");//Android
 			ucout << U("Unread the compressed format file!The default format is ASTC_4x4(Android platform)!") << std::endl;
 		}
 		fclose(fp);
