@@ -55,6 +55,7 @@ void usage () {
 	ucout << U("-a/--android \t\t- android platform") << std::endl;
 	ucout << U("-w/--wondows \t\t- windows platform") << std::endl;
 	ucout << U("-i/--ios \t\t- ios platform") << std::endl;
+	ucout << U("-g/--windows nothing \t\t- only windows nothing compress format") << std::endl;
 }
 static struct option long_options [] ={
 	{ U("file"), ARG_REQ, 0, U('f') },
@@ -70,6 +71,7 @@ static struct option long_options [] ={
 	{ U("android_platform"), ARG_NONE, 0, U('a') },
 	{ U("windows_platform"), ARG_NONE, 0, U('w') },
 	{ U("ios_platform"), ARG_NONE, 0, U('i') },
+	{ U("nothing"), ARG_NONE, 0, U('g') },
 
 	{ ARG_NULL, ARG_NULL, ARG_NULL, ARG_NULL }
 } ;
@@ -97,7 +99,7 @@ int main (int argc, char *argv []) {
 		// http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
 		// http://www.gnu.org/software/libc/manual/html_node/Argp-Examples.html#Argp-Examples
 		// http://stackoverflow.com/questions/13251732/c-how-to-specify-an-optstring-in-the-getopt-function
-		int c =getopt_long (argc, argv, U ("f:o:n:tlcehvawi"), long_options, &option_index) ;
+		int c =getopt_long (argc, argv, U ("f:o:n:tlcehvawig"), long_options, &option_index) ;
 		//printf("%c", c);
 		// Check for end of operation or error
 		if ( c == -1 )
@@ -152,8 +154,11 @@ int main (int argc, char *argv []) {
 				//printf("pc platform\n");
 				fwrite("windows_platform", strlen("windows_platform"), 1, fp);
 				break;
+			case U('g'): // windows nothing compress format
+				fwrite("_nothing", strlen("_nothing"), 1, fp);
+				break;
 			case U('i'): // windows platform
-						 //printf("ios platform\n");
+				//printf("ios platform\n");
 				fwrite("ios_platform", strlen("ios_platform"), 1, fp);
 				break;
 		}
