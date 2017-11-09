@@ -54,6 +54,7 @@ public:
 	void addModelUniformBuffer(int& uniformLayoutLocation);
 	void addProjectionUniformBuffer(int& uniformLayoutLocation);
 	void addJointUniformBuffer(int& uniformLayoutLocation);
+	void addJointUniformBuffer(int& uniformLayoutLocation, int matSize);
 	void addJointUniformBuffer();
 	void addAttribute (utility::string_t symbol, unsigned int type, size_t count =1, bool forcesAsAnArray =false) ;
 	void addUniform (utility::string_t symbol, unsigned int type, int& uniformLayoutLocation, size_t count =1, bool forcesAsAnArray =false) ;
@@ -90,6 +91,7 @@ class glslTech {
 	bool _bHasNormalMap ;
 	
 	int _uniformBindings = 0;
+	int _uniformLayoutLocation = 0;
 
 protected:
 	glslShader _vertexShader ;

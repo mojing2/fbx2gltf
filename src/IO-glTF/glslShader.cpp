@@ -125,8 +125,22 @@ void glslShader::addJointUniformBuffer(int& uniformLayoutLocation)
 	{\n\
 		mat4 u_jointMat;\n\
 	};\n");
-
 	uniformLayoutLocation++;
+	std::cout << "uniformLayoutLocation : " << uniformLayoutLocation << std::endl;
+}
+
+void glslShader::addJointUniformBuffer(int& uniformLayoutLocation, int matSize)
+{
+	// fixme: jointMat length
+	utility::string_t qualifier = U("layout( std140, binding = 2 ) uniform jointUniformBuffer \n\
+	{\n\
+		mat4 u_jointMat[");
+		qualifier += utility::conversions::to_string_t(matSize);
+		qualifier += U("];\n\
+	};\n");
+	_declarations += qualifier;
+	uniformLayoutLocation++;
+	std::cout << "uniformLayoutLocation : " << uniformLayoutLocation << std::endl;
 }
 
 void glslShader::addJointUniformBuffer()
@@ -149,6 +163,14 @@ int GetVertexAttributeLocation(utility::string_t& symbol)
 	else if (symbol.compare(U("a_texcoord0")) == 0)
 	{
 		layoutLocation = 2;
+	}
+	else if (symbol.compare(U("a_joint")) == 0)
+	{
+		layoutLocation = 3;
+	}
+	else if (symbol.compare(U("a_weight")) == 0)
+	{
+		layoutLocation = 4;
 	}
 	else
 	{
@@ -407,6 +429,7 @@ void glslTech::prepareParameters (web::json::value technique) {
 
 	// Parameters / attribute - uniforms - varying
 	web::json::value parameters =technique [U("parameters")] ;
+	unsigned int matSize = 0;
 	for ( auto iter =parameters.as_object ().begin () ; iter != parameters.as_object ().end () ; iter++ ) {
 		unsigned int iType =iter->second.as_object () [U("type")].as_integer () ;
 		bool bIsAttribute =technique [U("attributes")].has_field (U("a_") + iter->first) ;
@@ -417,10 +440,12 @@ void glslTech::prepareParameters (web::json::value technique) {
 			else
 				 if(iter->first == U("jointMat") || iter->first == U("modelViewMatrix") || iter->first == U("projectionMatrix") ) 
 				 {
-					//unsigned int matSize =iter->second.as_object () [U("count")].as_integer () ;
-					//utility::string_t jointMat =glslTech::format (U("%s[%d]"), iter->first.c_str(), matSize) ;
-					//_vertexShader.addUniform (jointMat, iType, _uniformLayoutLocation) ;
-					//_uniformLayoutLocation += 17;
+					matSize =iter->second.as_object () [U("count")].as_integer () ;
+					/*utility::string_t jointMat =glslTech::format (U("%s[%d]"), iter->first.c_str(), matSize) ;
+					ucout << "matSize : " << matSize << std::endl;
+					ucout << "jointMat : " << jointMat << std::endl;
+					_vertexShader.addUniform (jointMat, iType, _uniformLayoutLocation) ;
+					_uniformLayoutLocation += 17;*/
 				 }
 				 else
 				 {
@@ -451,7 +476,12 @@ void glslTech::prepareParameters (web::json::value technique) {
 	_bHasSkin =_bHasJoint && _bHasWeight ;
 	if (_bHasSkin)
 	{
-		_vertexShader.addJointUniformBuffer( _uniformBindings );
+		if (matSize <= 0) {
+			_vertexShader.addJointUniformBuffer(_uniformBindings);
+		}
+		else {
+			_vertexShader.addJointUniformBuffer(_uniformBindings, matSize);
+		}
 	}
 }
 
