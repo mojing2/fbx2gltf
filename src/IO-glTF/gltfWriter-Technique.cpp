@@ -24,12 +24,12 @@
 namespace _IOglTF_NS_ {
 
 void gltfWriter::AdditionalTechniqueParameters (FbxNode *pNode, web::json::value &techniqueParameters, bool bHasNormals /*=false*/, bool hasSkinning /*=false*/) {
-	//if ( bHasNormals ) {
-	//	techniqueParameters [U("normalMatrix")] =web::json::value::object ({ // normal matrix
-	//		{ U("semantic"), web::json::value::string (U("MODELVIEWINVERSETRANSPOSE")) },
-	//		{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT3) }
-	//	}) ;
-	//}
+	if ( bHasNormals ) {
+		techniqueParameters [U("normalMatrix")] =web::json::value::object ({ // normal matrix
+			{ U("semantic"), web::json::value::string (U("MODELVIEWINVERSETRANSPOSE")) },
+			{ U("type"), web::json::value::number ((int)IOglTF::FLOAT_MAT3) }
+		}) ;
+	}
 	// todo:
 	//techniqueParameters [U("modelViewMatrix")] =web::json::value::object ({ // modeliew matrix
 	//	{ U("semantic"), web::json::value::string (U("MODELVIEW")) },

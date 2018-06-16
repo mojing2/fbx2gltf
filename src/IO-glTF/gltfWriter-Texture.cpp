@@ -23,6 +23,8 @@
 
 #include <process.h>
 #include <direct.h>
+#include <fstream>
+#include <sstream>
 
 static bool Execute(const wchar_t * path)
 {
@@ -73,27 +75,22 @@ web::json::value gltfWriter::WriteTexture (FbxTexture *pTexture) {
 		cmd += U(" -o ");
 		cmd += outImagePath;
 
-		FILE *fp;
-		fp = fopen("config.log", "r");
-		char *platformType = "android_platform";
-		if (fp != NULL) {
-			fprintf(fp, "%s", platformType);
-			if (strcmp(platformType, "android_platform") == 0) {
-				cmd += U(" -f ASTC_4x4 -q astcfast ");//Android
-			}
-			else if (strcmp(platformType, "windows_platform") == 0) {
-				cmd += U(" -f BC3 ");//Windows
-			}
-			else {
-				cmd += U(" -f ASTC_4x4 -q astcfast ");//Android
-				ucout << U("Unread the compressed format file information!The default format is ASTC_4x4(Android platform)!") << std::endl;
-			}
+		std::ifstream fp("config.log");
+		std::string platformType;
+		fp >> platformType;
+		if ("android_platform" == platformType || "ios_platform" == platformType) {
+			cmd += U(" -f ASTC_6x6 -q astcfast ");//Android or ios
+		}
+		else if ("windows_platform" == platformType) {
+			cmd += U(" -f BC3 ");//Windows
+		}
+		else if ("windows_platform_nothing" == platformType) {
+			cmd += U(" -f r8g8b8a8 ");//Windows nothing compress format
 		}
 		else {
-			cmd += U(" -f ASTC_4x4 -q astcfast ");//Android
-			ucout << U("Unread the compressed format file!The default format is ASTC_4x4(Android platform)!") << std::endl;
+			cmd += U(" -f ASTC_6x6 -q astcfast ");//Android
+			ucout << U("Unread the compressed format file information!The default format is ASTC_4x4(Android platform)!") << std::endl;
 		}
-		fclose(fp);
 		//cmd += U(" -f ETC2_RGBA -q etcfast -m 9");
 		//cmd += U(" -f BC3 ");//Windows
 		//cmd += U(" -f ASTC_4x4 -q astcfast ");//Android

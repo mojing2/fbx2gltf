@@ -22,6 +22,8 @@
 #include "gltfWriter.h"
 #include "glslShader.h"
 #include <process.h>
+#include <fstream>
+#include <sstream>
 
 namespace _IOglTF_NS_ {
 
@@ -134,32 +136,39 @@ bool gltfWriter::WriteShaders () {
 		
 		FbxString gltfFilename (utility::conversions::to_utf8string (_fileName).c_str ()) ;
 
-		if ( GetIOSettings ()->GetBoolProp (IOSN_FBX_GLTF_EMBEDMEDIA, false) ) {
+		if (GetIOSettings()->GetBoolProp(IOSN_FBX_GLTF_EMBEDMEDIA, false)) {
 			utility::string_t vertexShaderFilePath;
 			utility::string_t fragmentShaderFilePath;
-#define IOSDISPOSE 0
 
-#if IOSDISPOSE
-			vertexShaderFilePath = ConvertGlslToSpirv(
-				tech.vertexShader().source(), 
-				vsName,
-				glslShader::ShaderType::Vertex
-			);
-			fragmentShaderFilePath = ConvertGlslToSpirv(
-				tech.fragmentShader().source(), 
-				fsName,
-				glslShader::ShaderType::Fragment
-			);
-			// data:[<mime type>][;charset=<charset>][;base64],<encoded data>
-			vertexShaderFilePath = IOglTF::dataURI(vertexShaderFilePath);
-			fragmentShaderFilePath = IOglTF::dataURI(fragmentShaderFilePath);
-#else
-			vertexShaderFilePath = IOglTF::dataURI(tech.vertexShader().source(), 0);
-			fragmentShaderFilePath = IOglTF::dataURI(tech.fragmentShader().source(), 0);
-#endif
+			std::ifstream fp("config.log");
+			std::string platformType;
+			fp >> platformType;
+			if ("ios_platform" == platformType) {
+				// IOS
+				vertexShaderFilePath = ConvertGlslToSpirv(
+					tech.vertexShader().source(),
+					vsName,
+					glslShader::ShaderType::Vertex
+				);
+				fragmentShaderFilePath = ConvertGlslToSpirv(
+					tech.fragmentShader().source(),
+					fsName,
+					glslShader::ShaderType::Fragment
+				);
+				// data:[<mime type>][;charset=<charset>][;base64],<encoded data>
+				vertexShaderFilePath = IOglTF::dataURI(vertexShaderFilePath);
+				fragmentShaderFilePath = IOglTF::dataURI(fragmentShaderFilePath);
+			}
+			else {
+				//Windows or Android
+				vertexShaderFilePath = IOglTF::dataURI(tech.vertexShader().source(), 0);
+				fragmentShaderFilePath = IOglTF::dataURI(tech.fragmentShader().source(), 0);
+			}
+
 			_json[U("shaders")][vsName][U("uri")] = web::json::value::string(vertexShaderFilePath);
 			_json[U("shaders")][fsName][U("uri")] = web::json::value::string(fragmentShaderFilePath);
-		} else {
+		}
+		else {
 			utility::string_t vsFilename =_json [U("shaders")] [vsName] [U("uri")].as_string () ;
 			{
 				FbxString shaderFilename (utility::conversions::to_utf8string (vsFilename).c_str ()) ;
